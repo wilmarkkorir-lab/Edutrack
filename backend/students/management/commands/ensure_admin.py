@@ -9,13 +9,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         username = os.environ.get("ADMIN_USERNAME", "admin")
-        password = os.environ.get("ADMIN_PASSWORD")
+        password = os.environ.get("ADMIN_PASSWORD") or "admin123"
         email = os.environ.get("ADMIN_EMAIL", "admin@example.com")
-        if not password:
-            self.stdout.write("ADMIN_PASSWORD not set - skipping admin creation.")
-            return
         User = get_user_model()
         if User.objects.filter(username=username).exists():
+            user = User.objects.get(username=username)
+            if password == "admin123" and not user.has_usable_password():
+                user.set_password(password)
+                user.save()
+                self.stdout.write(self.style.SUCCESS(f"Reset password for admin '{username}' to admin123."))
+                return
             self.stdout.write(f"Admin '{username}' already exists.")
             return
         User.objects.create_superuser(username=username, email=email, password=password)
