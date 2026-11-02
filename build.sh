@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 # Render build step: build React, copy it into Django, install Python deps, collect static files.
 set -o errexit
 
@@ -9,5 +9,6 @@ cp -r frontend/dist backend/frontend_dist
 
 echo "==> Installing backend"
 cd backend
+python3 -m pip install --upgrade pip
 pip install -r requirements.txt
-python manage.py collectstatic --noinput
+python3 manage.py collectstatic --noinput
