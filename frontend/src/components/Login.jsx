@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { api, setToken } from "../api";
 
-export default function Login({ onLogin }) {
+export default function Login({ onLogin, onBack }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
