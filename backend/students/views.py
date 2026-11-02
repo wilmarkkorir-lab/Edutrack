@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from django.db.models import Avg, Count
 from rest_framework import status, viewsets
 from rest_framework.authtoken.models import Token
@@ -18,7 +19,7 @@ class LoginView(APIView):
 
     def post(self, request):
         user = authenticate(
-            username=request.data.get("username", ""),
+            username=request.data.get("username", "").strip(),
             password=request.data.get("password", ""),
         )
         if not user:
@@ -27,6 +28,26 @@ class LoginView(APIView):
             )
         token, _ = Token.objects.get_or_create(user=user)
         return Response({"token": token.key, "username": user.username})
+
+
+class RegisterView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        username = request.data.get("username", "").strip()
+        password = request.data.get("password", "")
+
+        if not username or not password:
+            return Response({"detail": "Username and password are required."}, status=status.HTTP_400_BAD_REQUEST)
+        if len(password) < 4:
+            return Response({"detail": "Password must be at least 4 characters."}, status=status.HTTP_400_BAD_REQUEST)
+        if User.objects.filter(username__iexact=username).exists():
+            return Response({"detail": "Username already taken."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.create_user(username=username, password=password)
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({"token": token.key, "username": user.username}, status=status.HTTP_201_CREATED)
 
 
 class LogoutView(APIView):

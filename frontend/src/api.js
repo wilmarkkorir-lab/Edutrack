@@ -33,6 +33,7 @@ async function request(path, { method = "GET", body, auth = true } = {}) {
 
 export const api = {
   login: (username, password) => request("/auth/login/", { method: "POST", body: { username, password }, auth: false }),
+  register: (username, password) => request("/auth/register/", { method: "POST", body: { username, password }, auth: false }),
   logout: () => request("/auth/logout/", { method: "POST" }),
   stats: () => request("/students/stats/"),
   list: (params) => request(`/students/?${new URLSearchParams(params)}`),
