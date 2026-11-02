@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: edutrack
+    runtime: python
+    plan: free
+    buildCommand: ./build.sh
+    startCommand: ./start.sh
+    healthCheckPath: /admin/login/
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD        # generated once; read it in Render > Environment
+        generateValue: true
+      - key: SEED_DEMO_DATA        # set to "false" once you enter real data
+        value: "true"
+    # --- To keep SQLite data across deploys/restarts, use a paid plan and uncomment: ---
+    # disk:
+    #   name: edutrack-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    # (and add env var SQLITE_PATH = /var/data/db.sqlite3)
